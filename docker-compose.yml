@@ -36,6 +36,12 @@ services:
       # 127.0.0.1 y no solo "5432:5432". Sin la dirección, un puerto publicado escucha en
       # TODAS las interfaces, incluida la wifi en la que estés. Con ella, solo esta máquina.
       - "127.0.0.1:5432:5432"
+    # Docker Desktop for Windows defaults to the `local` logging driver, which writes
+    # <id>/local-logs/container.log. Filebeat's container parser expects Docker's
+    # json-file envelope at <id>/<id>-json.log, so force the driver the course assumes.
+    # On Linux this is the default anyway; making it explicit keeps both machines equal.
+    logging:
+      driver: json-file
 
   backend:
     # The context is the repository root and not ./backend, because the image has to be
@@ -92,6 +98,8 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - ./data/images:/app/images:ro
+    logging:
+      driver: json-file
 
   # The toolchain: alembic and pytest, run where the application runs. See
   # backend/Dockerfile.tools for why this is not optional on this machine.
@@ -179,6 +187,8 @@ services:
       # La API solo admite este origen (CORS_ORIGINS). Si cambias el puerto, cambia también
       # esa variable, o el navegador bloqueará todas las llamadas.
       - "127.0.0.1:5173:5173"
+    logging:
+      driver: json-file
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:9.5.3
@@ -202,6 +212,8 @@ services:
       # El marcador de por dónde va leyendo. Sin este volumen, un reinicio reenvía todo
       # desde el principio y los logs salen duplicados.
       - shop_filebeatdata:/usr/share/filebeat/data
+    logging:
+      driver: json-file
     networks:
       # Las dos, y esta es la parte que hay que entender. Un proyecto de compose crea su
       # propia red y no ve las de los demás: desde `tienda_default` el nombre
