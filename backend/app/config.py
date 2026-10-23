@@ -59,6 +59,11 @@ CORS_ORIGINS = [
 # dev server for the same reason.
 PUBLIC_WEB_URL = os.environ.get("PUBLIC_WEB_URL", CORS_ORIGINS[0] if CORS_ORIGINS else "http://localhost:5173").rstrip("/")
 
+# Which version is running, for GET /version. Render sets RENDER_GIT_COMMIT on every
+# deploy, so production answers without anybody remembering to bump a number; locally the
+# answer is "local" from .env, or "unknown" when nothing is configured.
+APP_VERSION = os.environ.get("APP_VERSION") or os.environ.get("RENDER_GIT_COMMIT", "unknown")
+
 # Folder with the product images; the API serves it as static files under /images.
 # parents[2] walks up from app/config.py to the root of the repository: app -> backend -> root.
 # Docker mounts that same folder somewhere else and sets IMAGES_DIR to say where.

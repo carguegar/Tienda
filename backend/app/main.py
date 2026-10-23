@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine, text
 from sqlalchemy.pool import NullPool
 
-from app.config import CORS_ORIGINS, IMAGES_DIR
+from app.config import APP_VERSION, CORS_ORIGINS, IMAGES_DIR
 from app.db import engine
 from app.observability import configure_logging, log, log_requests
 from app.routes import cart, categories, orders, products, users
@@ -100,6 +100,13 @@ app.middleware("http")(log_requests)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/version")
+def version():
+    # /health says the shop is up; this says which commit is up. One line, and nobody has
+    # to guess what is deployed or compare dates in the Render dashboard.
+    return {"version": APP_VERSION}
 
 
 app.include_router(cart.router)

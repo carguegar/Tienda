@@ -110,6 +110,14 @@ def test_the_shop_says_it_is_alive(client):
     assert client.get("/health").json() == {"status": "ok"}
 
 
+def test_the_shop_can_say_which_version_is_deployed(client):
+    # /health answers "is it up"; this answers "what is up". The value is configuration,
+    # so the test checks the route reports it rather than pinning a version.
+    from app.config import APP_VERSION
+
+    assert client.get("/version").json() == {"version": APP_VERSION}
+
+
 def test_the_frontend_is_allowed_to_call_the_api_and_a_stranger_is_not(client):
     # CORS is configuration, not code, and it is the one thing that stops the shop working
     # in a browser while curl says everything is fine.

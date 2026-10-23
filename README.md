@@ -22,8 +22,14 @@ cp .env.example .env
 Base de datos (solo el servicio `db`; el esquema lo crea Alembic, no Docker):
 
 ```bash
-docker compose up -d
+docker compose up -d --build db backend frontend
 ```
+
+> Ese comando arranca lo mínimo para usar la tienda. El `docker-compose.yml` completo incluye
+> **Filebeat**, que necesita el stack `elastic-real` de la sesión 24 y su red externa. Si no lo
+> tienes levantado, no arranques Filebeat: los logs siguen saliendo por stdout y se ven con
+> `docker compose logs -f backend`. Deja los valores de `ELASTIC_*` de `.env.example` aunque no
+> uses Filebeat, porque Compose lee el fichero entero.
 
 Backend, en `http://localhost:8000` (documentación interactiva en `/docs`):
 
@@ -284,6 +290,18 @@ Dos detalles de este checkpoint vienen de ahí:
   servicio está vivo, igual que el healthcheck del compose, y cada «sí» era una línea: en Kibana eran la
   mayoría. Un `/health` que **falla** sí se registra, porque ese sí es noticia.
 
+### Saber qué versión está desplegada
+
+`GET /version` responde `{"version": "..."}`. Es la recomendación de la primera sesión: cuesta una línea
+y evita discutir qué commit está en producción. En Render no hay que configurar nada, porque el host
+pone `RENDER_GIT_COMMIT` en cada despliegue y la API lo usa cuando `APP_VERSION` no está definida. En
+local, `.env` fija `APP_VERSION=local`.
+
+```bash
+curl -s http://localhost:8000/version
+# {"version":"local"}
+```
+
 ## El contrato de la API (`openapi.json`)
 
 FastAPI **genera** el documento OpenAPI a partir del código: recorre las rutas y lee las firmas, los
@@ -322,7 +340,7 @@ primera vez y se construye **ejecutando las migraciones de verdad**. Nunca tocan
 así que no pueden llevarse por delante los datos de la clase.
 
 ```bash
-cd backend && .venv/Scripts/activate && pip install -r requirements-dev.txt && pytest
+cd backend && .venv/Scripts/activate && pip install -r requirements-dev.txt && python -m pytest
 ```
 
 Cada test corre dentro de una transacción que se deshace al terminar, así que todos empiezan con los

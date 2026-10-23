@@ -108,7 +108,7 @@ jobs:
         run: npm run build
 
   backend:
-    name: Backend (168 tests)
+    name: Backend (169 tests)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -161,7 +161,7 @@ jobs:
 
       - run: pip install -r requirements-dev.txt
 
-      # 168 tests: services, HTTP routes, the two-buyer race, every migration up and down
+      # 169 tests: services, HTTP routes, the two-buyer race, every migration up and down
       # again, the schema-drift check, the committed OpenAPI contract, what the logs are
       # allowed to say - and, since the shop started charging, a gateway that is stood in
       # for rather than called.

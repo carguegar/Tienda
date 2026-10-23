@@ -49,6 +49,8 @@ services:
       # que un mismo Elasticsearch puede tener desarrollo y producción sin mezclarlos.
       ENVIRONMENT: ${ENVIRONMENT:-development}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # Lo que responde GET /version dentro del contenedor. En Render lo pone el host.
+      APP_VERSION: ${APP_VERSION:-local}
       # Qué páginas pueden llamar a la API. Sale de .env (o del terminal); si no está, el
       # servidor de Vite de este mismo compose.
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
@@ -94,7 +96,7 @@ services:
   # The toolchain: alembic and pytest, run where the application runs. See
   # backend/Dockerfile.tools for why this is not optional on this machine.
   #
-  #     docker compose --profile tools run --rm tools pytest
+  #     docker compose --profile tools run --rm tools python -m pytest
   #     docker compose --profile tools run --rm tools alembic upgrade head
   #     docker compose --profile tools run --rm tools alembic revision --autogenerate -m "..."
   #
